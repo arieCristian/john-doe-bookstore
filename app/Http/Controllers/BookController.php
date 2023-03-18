@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
@@ -27,8 +28,26 @@ class BookController extends Controller
                 $query->where('name', 'like', "%$search%");
             });
         })
-        ->take(10)
+        ->take($listShown)
         ->get();
         return view('book-list',compact('books','search','listShown'));
+    }
+
+    public function topAuthors(){
+        // $authorsWithReviews = Author::withCount(['reviews as total_reviews_greater_than_5' => function ($query) {
+        //     $query->where('rating', '>', 5);
+        // }])
+        // ->has('reviews', '>', 0)
+        // ->get();
+
+        $authors = Author::withCount(['review as voter' => function ($query){
+            $query->where('rating' , '>' , 5);
+        }],'rating')
+        ->orderByDesc('voter')
+        ->take(10)
+        ->get();
+        
+
+        return view('top-authors',compact('authors'));
     }
 }
