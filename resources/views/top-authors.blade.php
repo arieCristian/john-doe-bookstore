@@ -20,13 +20,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Books List</a>
+                        <a class="nav-link" aria-current="page" href="/">Books List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/top-authors">Top Authors</a>
+                        <a class="nav-link active" href="/top-authors">Top Authors</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/review">Review</a>
+                        <a class="nav-link" href="/insert-rating">Insert Rating</a>
                     </li>
                 </ul>
             </div>

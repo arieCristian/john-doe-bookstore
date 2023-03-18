@@ -17,7 +17,7 @@ class ReviewFactory extends Factory
     public function definition()
     {
         return [
-            'book_id' => fake()->numberBetween($min = 1, $max = 500),
+            'book_id' => fake()->numberBetween($min = 1, $max = 10000),
             'rating' => fake()->numberBetween($min = 1, $max = 10),
         ];
     }

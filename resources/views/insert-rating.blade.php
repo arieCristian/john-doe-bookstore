@@ -20,10 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Books List</a>
+                        <a class="nav-link" aria-current="page" href="/">Books List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/top-authors">Top Authors</a>
+                        <a class="nav-link active" href="/top-authors">Top Authors</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/insert-rating">Insert Rating</a>
@@ -36,34 +36,45 @@
     {{-- CONTENT --}}
     <div class="container d-flex justify-content-center">
             <div class="col-lg-10 card p-4 mt-4">
-                <h1>Book List</h1>
-
+                <h1>Insert Rating</h1>
                 {{-- FILTER DATA --}}
-                <form action="/" method="GET">
+                <form action="/insert-rating" method="POST">
+                    @csrf
                     <table>
                         <tr>
                             <td width="20%">
-                                List Shown
+                                Book Author
                             </td>
                             <td width="5%">:</td>
-                            <td><select style="width: 100px" class="form-select ml-4" name="listShown">
-                                @for ($i = 10; $i <= 100; $i +=10) 
-                                    @if ($i == $listShown)
-                                    <option selected value="{{ $i }}">{{ $i }}</option>
+                            <td><select style="width: 400px" class="form-select ml-4" name="author" id="author">
+                                @foreach ($authors as $author)
+                                    @if ($author->id == $authorSelected->id)
+                                    <option selected value="{{ $author->id }}">{{ $author->name }}</option>
                                     @else
-                                    <option value="{{ $i }}">{{ $i }}</option>    
+                                    <option value="{{ $author->id }}">{{ $author->name }}</option>    
                                     @endif
-                                @endfor
+                                @endforeach
                             </select></td>
                         </tr>
                         <tr>
-                            <td>
-                                Search
+                            <td width="20%">
+                                Book Name
                             </td>
-                            <td>:</td>
-                            <td>
-                                <input style="width: 400px" class="form-control" type="text" placeholder="Search book or author name ..." name="search" value="{{ $search }}">
+                            <td width="5%">:</td>
+                            <td><select style="width: 400px" class="form-select ml-4" name="book" id="book">
+                                {!! $list !!}
+                            </select></td>
+                        </tr>
+                        <tr>
+                            <td width="20%">
+                                Rating
                             </td>
+                            <td width="5%">:</td>
+                            <td><select style="width: 100px" class="form-select ml-4" name="rating">
+                                @for ($i = 1; $i <= 10; $i++) 
+                                    <option value="{{ $i }}">{{ $i }}</option>    
+                                @endfor
+                            </select></td>
                         </tr>
                         <tr>
                             <td>
@@ -77,33 +88,6 @@
                     </table>
                 </form>
                 {{-- END FILTER DATA --}}
-
-                {{-- BOOKS DATA --}}
-                <table class="table table-striped mt-4">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Book Name</th>
-                            <th>Category Name</th>
-                            <th>Author Name</th>
-                            <th>Avarage Rating</th>
-                            <th>Voter</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($books as $book)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $book->name }}</td>
-                            <td>{{ $book->category->name }}</td>
-                            <td>{{ $book->author->name }}</td>
-                            <td>{{ round($book->review_avg_rating , 2) }}</td>
-                            <td>{{ $book->review_count }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                {{-- END BOOKS DATA --}}
             </div>
     </div>
     {{-- END CONTENT --}}
@@ -112,6 +96,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script>
+        $('#author').change(function(){
+        var author = $('#author').val();
+            $.get("{{ URL::to('/insert-rating') }}",{author:author}, function(data){
+                $('#book').html(data);
+            })
+        });
     </script>
 </body>
 

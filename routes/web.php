@@ -16,5 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BookController::class, 'index']);
 Route::get('/top-authors', [BookController::class, 'topAuthors']);
+Route::get('/insert-rating', [BookController::class, 'insertRating']);
+Route::post('/insert-rating', [BookController::class, 'storeRating']);
 
 

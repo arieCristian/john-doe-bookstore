@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use App\Models\Book;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -22,6 +23,7 @@ class BookController extends Controller
         ->withAvg('review', 'rating')
         ->withCount('review')
         ->orderByDesc('review_avg_rating')
+        ->orderByDesc('review_count')
         ->when($search, function ($query, $search) {
             return $query->where('name', 'like', "%$search%")
             ->orWhereHas('author', function ($query) use ($search) {
@@ -34,12 +36,6 @@ class BookController extends Controller
     }
 
     public function topAuthors(){
-        // $authorsWithReviews = Author::withCount(['reviews as total_reviews_greater_than_5' => function ($query) {
-        //     $query->where('rating', '>', 5);
-        // }])
-        // ->has('reviews', '>', 0)
-        // ->get();
-
         $authors = Author::withCount(['review as voter' => function ($query){
             $query->where('rating' , '>' , 5);
         }],'rating')
@@ -49,5 +45,37 @@ class BookController extends Controller
         
 
         return view('top-authors',compact('authors'));
+    }
+
+    public function insertRating(Request $request){
+        $authors = Author::orderBy('name','asc')->get();
+        $bookAuthor = $request->author ;
+        if($bookAuthor){
+            $authorSelected = Author::findOrFail($bookAuthor);
+        }else {
+            $authorSelected = $authors->first();
+        }
+        $books = Book::with('author')
+        ->where('author_id' , $authorSelected->id)
+        ->get();
+
+        if ($request->ajax()) {
+            return view('book', [
+                'books' => $books,
+            ]);
+        }
+        $list = view('book', [
+            'books' => $books,
+        ])->render();
+
+        return view ('insert-rating',compact('authorSelected','authors','list'));
+    }
+
+    public function storeRating(Request $request){
+        Review::create([
+            'book_id' => $request->book,
+            'rating' => $request->rating
+        ]);
+        return redirect('/');
     }
 }
