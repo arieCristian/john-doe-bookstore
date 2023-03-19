@@ -23,10 +23,10 @@
                         <a class="nav-link" aria-current="page" href="/">Books List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/top-authors">Top Authors</a>
+                        <a class="nav-link" href="/top-authors">Top Authors</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/insert-rating">Insert Rating</a>
+                        <a class="nav-link active" href="/insert-rating">Insert Rating</a>
                     </li>
                 </ul>
             </div>
@@ -36,6 +36,11 @@
     {{-- CONTENT --}}
     <div class="container d-flex justify-content-center">
             <div class="col-lg-10 card p-4 mt-4">
+                @if (session()->has('faild'))
+                <div class="alert alert-danger" role="alert">
+                    {{ session('faild') }}
+                </div>  
+                @endif
                 <h1>Insert Rating</h1>
                 {{-- FILTER DATA --}}
                 <form action="/insert-rating" method="POST">

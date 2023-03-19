@@ -14,10 +14,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Category::factory(300)->create();
-        \App\Models\Author::factory(100)->create();
-        \App\Models\Book::factory(10000)->create();
-        \App\Models\Review::factory(50000)->create();
+        // \App\Models\Category::factory(10)->create();
+        // \App\Models\Author::factory(20)->create();
+        // \App\Models\Book::factory(100)->create();
+        // \App\Models\Review::factory(500)->create();
+
+        $this->call([
+            AuthorSeeder::class,
+            CategorySeeder::class,
+            BookSeeder::class,
+            ReviewSeeder::class
+        ]);
 
     }
 }

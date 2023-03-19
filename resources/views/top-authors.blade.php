@@ -50,7 +50,7 @@
                         @foreach ($authors as $author)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $author->name }}</td>
+                            <td>{{ $author->author_name }}</td>
                             <td>{{ $author->voter }}</td>
                         </tr>
                         @endforeach

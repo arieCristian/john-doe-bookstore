@@ -5,58 +5,60 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Review;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
     public function index(Request $request){
 
-        $listShown = $request->listShown ;
-        $search = $request->search ;
-
-        if($listShown == null){
-            $listShown = 10 ;
-        }
-
-        $books = Book::with('category')
-        ->with('author')
-        ->withAvg('review', 'rating')
-        ->withCount('review')
-        ->orderByDesc('review_avg_rating')
-        ->orderByDesc('review_count')
-        ->when($search, function ($query, $search) {
-            return $query->where('name', 'like', "%$search%")
-            ->orWhereHas('author', function ($query) use ($search) {
-                $query->where('name', 'like', "%$search%");
-            });
-        })
-        ->take($listShown)
-        ->get();
+    $listShown = $request->listShown ;
+    $search = $request->search ;
+    if($listShown == null){
+        $listShown = 10 ;
+    }
+    $books = Review::select('books.name as book_name','books.id', 'authors.name as author_name','categories.name as category_name', 
+    DB::raw('avg(rating) as average_rating'),
+    DB::raw('count(rating) as voter'))
+    ->join('books', 'reviews.book_id', '=', 'books.id')
+    ->join('authors', 'books.author_id', '=', 'authors.id')
+    ->join('categories', 'books.category_id', '=', 'categories.id')
+    ->where('books.name', 'LIKE', '%'.$search.'%')
+    ->orWhere('authors.name', 'LIKE', '%'.$search.'%')
+    ->groupBy('books.name', 'books.id', 'authors.name','categories.name')
+    ->orderByDesc('average_rating')
+    ->orderByDesc('voter')
+    ->take($listShown)
+    ->get();
+    
         return view('book-list',compact('books','search','listShown'));
     }
 
     public function topAuthors(){
-        $authors = Author::withCount(['review as voter' => function ($query){
-            $query->where('rating' , '>' , 5);
-        }],'rating')
+        $authors = Review::select('authors.name as author_name',
+        DB::raw('count(rating) as voter'))
+        ->join('books', 'reviews.book_id', '=', 'books.id')
+        ->join('authors', 'books.author_id', '=', 'authors.id')
+        ->where('rating', '>', 5 )
+        ->groupBy('authors.name')
         ->orderByDesc('voter')
         ->take(10)
         ->get();
-        
-
         return view('top-authors',compact('authors'));
     }
 
     public function insertRating(Request $request){
-        $authors = Author::orderBy('name','asc')->get();
+        $authors = Author::orderBy('name' , 'asc')->get();
         $bookAuthor = $request->author ;
         if($bookAuthor){
             $authorSelected = Author::findOrFail($bookAuthor);
         }else {
             $authorSelected = $authors->first();
         }
-        $books = Book::with('author')
+        $books = Book::select('name','id')
         ->where('author_id' , $authorSelected->id)
+        ->orderBy('name' ,'asc')
         ->get();
 
         if ($request->ajax()) {
@@ -72,10 +74,16 @@ class BookController extends Controller
     }
 
     public function storeRating(Request $request){
-        Review::create([
-            'book_id' => $request->book,
-            'rating' => $request->rating
-        ]);
-        return redirect('/');
+        
+        $book = Book::findOrFail($request->book);
+        if($book->author_id == $request->author){
+            Review::create([
+                'book_id' => $request->book,
+                'rating' => $request->rating
+            ]);
+            return redirect('/')->with('success', 'success add new book rating');
+        }else {
+            return redirect('/insert-rating')->with('faild', 'faild to add new rating, because the name of the book you entered and the name of the author you entered did not match !. Maybe you are trying to change the value of the available input options ');
+        }
     }
 }

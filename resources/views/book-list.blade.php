@@ -36,6 +36,11 @@
     {{-- CONTENT --}}
     <div class="container d-flex justify-content-center">
             <div class="col-lg-10 card p-4 mt-4">
+                @if (session()->has('success'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('success') }}
+                </div>  
+                @endif
                 <h1>Book List</h1>
 
                 {{-- FILTER DATA --}}
@@ -94,11 +99,11 @@
                         @foreach ($books as $book)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $book->name }}</td>
-                            <td>{{ $book->category->name }}</td>
-                            <td>{{ $book->author->name }}</td>
-                            <td>{{ round($book->review_avg_rating , 2) }}</td>
-                            <td>{{ $book->review_count }}</td>
+                            <td>{{ $book->book_name }}</td>
+                            <td>{{ $book->category_name }}</td>
+                            <td>{{ $book->author_name }}</td>
+                            <td>{{ round($book->average_rating , 2) }}</td>
+                            <td>{{ $book->voter }}</td>
                         </tr>
                         @endforeach
                     </tbody>
