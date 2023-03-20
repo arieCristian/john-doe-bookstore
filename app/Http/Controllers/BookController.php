@@ -77,11 +77,15 @@ class BookController extends Controller
         
         $book = Book::findOrFail($request->book);
         if($book->author_id == $request->author){
-            Review::create([
-                'book_id' => $request->book,
-                'rating' => $request->rating
-            ]);
-            return redirect('/')->with('success', 'success add new book rating');
+            if($request->rating >= 1 && $request->rating <= 10){
+                Review::create([
+                    'book_id' => $request->book,
+                    'rating' => $request->rating
+                ]);
+                return redirect('/')->with('success', 'success add new book rating');
+            }else{
+                return redirect('/insert-rating')->with('faild', 'faild to add new rating, because the rating you entered not between 1 - 10 !. Maybe you are trying to change the value of the available input options ');
+            }
         }else {
             return redirect('/insert-rating')->with('faild', 'faild to add new rating, because the name of the book you entered and the name of the author you entered did not match !. Maybe you are trying to change the value of the available input options ');
         }
