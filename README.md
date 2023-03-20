@@ -9,7 +9,7 @@
 How to Instal this porject
 
 ```bash
-  Run git https://github.com/arieCristian/john-doe-bookstore.git
+  Run git clone https://github.com/arieCristian/john-doe-bookstore.git
   Run cd to the newly created /john-doe-bookstore directory
   Run composer install command
   Run cp .env.example .env command
